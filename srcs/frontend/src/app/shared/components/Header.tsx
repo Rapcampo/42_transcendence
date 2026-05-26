@@ -8,7 +8,10 @@ import {
   LogOut,
   MessageCircle,
   Shield,
+  ShoppingBag,
+  Server,
 } from "lucide-react";
+import { ROUTES } from "@/app/shared/utils/constants";
 import { useTheme } from "@/app/core/contexts/ThemeContext";
 import { useAuth } from "@/app/core/contexts/AuthContext";
 import { Cart } from "@/app/features/cart/components/Cart";
@@ -51,6 +54,20 @@ export function Header() {
 
             {user && (
               <Link
+                to={ROUTES.ORDERS}
+                className={`btn-icon ${
+                  location.pathname.startsWith("/orders")
+                    ? "bg-purple-50 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400"
+                    : ""
+                }`}
+                title="My Orders"
+              >
+                <ShoppingBag className="h-5 w-5" />
+              </Link>
+            )}
+
+            {user && (
+              <Link
                 to="/chat"
                 className={`btn-icon ${
                   location.pathname === "/chat"
@@ -80,9 +97,14 @@ export function Header() {
                   </span>
                 </Link>
                 {user.role === "admin" && (
-                  <Link to="/admin" className="btn-icon" title="Admin Panel">
-                    <Shield className="h-5 w-5" />
-                  </Link>
+                  <>
+                    <Link to="/admin" className="btn-icon" title="Admin Panel">
+                      <Shield className="h-5 w-5" />
+                    </Link>
+                    <a href="/metrics/" className="btn-icon" title="Metrics">
+                      <Server className="h-5 w-5" />
+                    </a>
+                  </>
                 )}
                 <button
                   onClick={() => {
