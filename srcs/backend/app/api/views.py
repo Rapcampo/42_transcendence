@@ -811,7 +811,8 @@ class listing_id(APIView):
 
 class listing_full(APIView):
     def post(self, request):
-        return proxy_request("POST", "/listings/", request.data)
+        serializer = serializers.listingsPostSerializer(data=request.data)
+        return proxy_request("POST", "/listings/", serializer.validated_data)
 
     def get(self, request):
         return proxy_request("GET", "/listings/")
@@ -907,6 +908,7 @@ class seller_product(APIView):
 class create_checkout(APIView):
     permission_classes = [IsAuthenticated]
     def post(self, request):
+        validated_cart = serializers.orderSerializer(data=request.data)
         items = request.data.get("items", [])
         if not items:
             return Response({"details": "Cart is empty"},

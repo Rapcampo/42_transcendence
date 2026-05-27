@@ -1,14 +1,28 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from django.core.validators import RegexValidator
+from django.db import models
 
 # -- AUTH SERIALIZERS --
+phone_validator = RegexValidator(
+        regex=r"^(?:\+[1-9]\d{7,14}|\d{9})$",
+        message="Enter a valid phone number, e.g. +351912345678 or 912345678.",
+        )
+
+class customer(models.Model):
+    phone_number = models.CharField(
+            max_length=16,
+            validators=[phone_validator],
+            blank=True,
+            null=True,
+            )
 
 class RegisterSerializer(serializers.Serializer):
     """POST /api/auth/register/ — validate input before sending to data-service"""
     name = serializers.CharField(min_length=3, max_length=150)  
     email = serializers.EmailField()
     password = serializers.CharField(min_length=8, max_length=64, write_only=True)
-    phone = serializers.IntegerField(allow_null=True, allow_blank=True, required=False, max_length=13)
+    phone = [phone_validator],
     avatar_url = serializers.CharField(allow_null=True, allow_blank=True, required=False, max_length=500)
 
 class LoginSerializer(serializers.Serializer):
@@ -133,12 +147,17 @@ class listingIdPatch(serializers.Serializer):
 
 # /api/orders/
 
+
+class orderFormat(serializers.Serializer):
+    id = serializers.IntegerField(min_value=1)
+    quantity = serializers.IntegerField(min_value=1, max_value=99)
+
 class orderSerializer(serializers.Serializer):
-    items = serializers.ListField(
-            id=serializers.IntegerField(min_length=1),
-            quantity=serializers.IntegerField(min_length=1, max_length=2),
+    items = orderFormat(
+            many=True,
+            allow_empty=False,
             min_length=1,
-            max_lengt=100,
+            max_length=100,
             )
 
 # /api/users/{id}
