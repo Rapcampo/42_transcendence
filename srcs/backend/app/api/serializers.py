@@ -8,7 +8,7 @@ class RegisterSerializer(serializers.Serializer):
     name = serializers.CharField(min_length=3, max_length=150)  
     email = serializers.EmailField()
     password = serializers.CharField(min_length=8, max_length=64, write_only=True)
-    phone = serializers.CharField(allow_null=True, allow_blank=True, required=False, max_length=13)
+    phone = serializers.IntegerField(allow_null=True, allow_blank=True, required=False, max_length=13)
     avatar_url = serializers.CharField(allow_null=True, allow_blank=True, required=False, max_length=500)
 
 class LoginSerializer(serializers.Serializer):
@@ -19,7 +19,7 @@ class LoginSerializer(serializers.Serializer):
 class ProfilePatchSerializer(serializers.Serializer):
     """PATCH /api/auth/profile/ — partial update fields"""
     name = serializers.CharField(allow_null=True, allow_blank=True, required=False, max_length=150) 
-    phone = serializers.CharField(allow_null=True, allow_blank=True, required=False, max_length=13)
+    phone = serializers.IntegerField(allow_null=True, allow_blank=True, required=False, max_length=13)
     avatar_url = serializers.CharField(allow_null=True, allow_blank=True, required=False, max_length=500)
 
 class ChangePasswordSerializer(serializers.Serializer):
@@ -65,11 +65,13 @@ class ChatConversationCreateSerializer(serializers.Serializer):
 
 # -- FOLLOW SERIALIZERS --
 
+
 class FollowActionSerializer(serializers.Serializer):
     """POST /api/follow/  and  DELETE /api/follow/  — target user to follow or unfollow."""
     following_id = serializers.IntegerField(min_value=1)
 
 # -- NOTIFICATION SERIALIZERS --
+
 
 class NotificationReadSerializer(serializers.Serializer):
     ids = serializers.ListField(
@@ -79,6 +81,27 @@ class NotificationReadSerializer(serializers.Serializer):
     )
 
 # -- LISTINGS SERIALIZERS --
+
+# /api/listings
+
+
+class listingPostSerializer(serializers.Serializer):
+    name = serializers.CharField(
+        min_length=3,
+        max_length=255,
+        trim_whitespace=True,
+    )
+    slug = serializers.SlugField(
+        min_length=1
+    )
+    description = serializers.CharField(
+        allow_null=True,
+        allow_blank=True,
+    )
+    price = serializers.DecimalField(
+        max_digits=6,
+        decimal_places=2,
+    )
 
 # /api/listings/{id}
 
@@ -102,11 +125,20 @@ class listingIdPatch(serializers.Serializer):
         required=False,
     )
     price = serializers.DecimalField(
-        max_digits=10,
+        max_digits=6,
         decimal_places=2,
         required=False,
     )
 
-# /api/listings
+
+# /api/orders/
+
+class orderSerializer(serializers.Serializer):
+    items = serializers.ListField(
+            id=serializers.IntegerField(min_length=1),
+            quantity=serializers.IntegerField(min_length=1, max_length=2),
+            min_length=1,
+            max_lengt=100,
+            )
 
 # /api/users/{id}
